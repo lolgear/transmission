@@ -28,23 +28,22 @@ let package = Package(
 // TODO: Add compiler flag -msse4.2 to src/crc32c_sse42.cc
 //        .library(name: "crc32c", targets: ["crc32c"]),
         .library(name: "dht", targets: ["dht"]),
-// TODO: Fix build by figuring out how to properly resolve headers include statements / macros
-//        .library(name: "fmt", targets: ["fmt"]),
+// TODO: Add src/dummy.cpp (empty file)
+        .library(name: "fmt", targets: ["fmt"]),
         .library(name: "b64", targets: ["b64"]),
         .library(name: "deflate", targets: ["deflate"]),
 // TODO: Copy libevent headers properly.
 // Copy ./macosx-libevent-evconfig-private.h to ./libevent/include/event-evconfig-private.h
 // Copy ./macosx-libevent-event-config.h to ./libevent/include/event2/event-config.h
 //        .library(name: "event", targets: ["event"])
-// TODO: Fix headers layout.
+// TODO: Fix headers layout. Add public header search path. Maybe add include folder.
 //        .library(name: "natpmp", targets: ["natpmp"]),
 // TODO: Add build script.
 //        .library(name: "psl", targets: ["psl"])
         .library(name: "utp", targets: ["utp"]),
-// TODO: Move ./miniupnp/miniupnpc/miniupnpcstrings.h to ./miniupnp/miniupnpc/src/miniupnpcstrings.h
-//      .library(name: "miniupnpc", targets: ["miniupnpc"]),
+        .library(name: "miniupnpc", targets: ["miniupnpc"]),
 // TODO: Add src/dummy.cpp (empty file)
-//        .library(name: "small", targets: ["small"]),
+        .library(name: "small", targets: ["small"]),
         .library(name: "wildmat", targets: ["wildmat"])
     ],
     targets: [
@@ -52,19 +51,19 @@ let package = Package(
             name: "crc32c",
             path: "crc32c",
             exclude: [
-//                "crc32c_arm64_unittest.cc",
-//                "crc32c_benchmark.cc",
-//                "crc32c_capi_unittest.c",
-//                "crc32c_portable_unittest.cc",
-//                "crc32c_prefetch_unittest.cc",
-//                "crc32c_read_le_unittest.cc",
-//                "crc32c_round_up_unittest.cc",
-//                "crc32c_sse42_unittest.cc",
-//                "crc32c_test_main.cc",
-//                "crc32c_unittest.cc",
-//                "../third_party/benchmark",
-//                "../third_party/glog",
-//                "../third_party/googletest",
+                "src/crc32c_arm64_unittest.cc",
+                "src/crc32c_benchmark.cc",
+                "src/crc32c_capi_unittest.c",
+                "src/crc32c_portable_unittest.cc",
+                "src/crc32c_prefetch_unittest.cc",
+                "src/crc32c_read_le_unittest.cc",
+                "src/crc32c_round_up_unittest.cc",
+                "src/crc32c_sse42_unittest.cc",
+                "src/crc32c_test_main.cc",
+                "src/crc32c_unittest.cc",
+                "third_party/benchmark",
+                "third_party/glog",
+                "third_party/googletest",
             ],
             sources: [
                 "src/crc32c.cc",
@@ -84,7 +83,7 @@ let package = Package(
             name: "fmt",
             path: "fmt",
             sources: [
-                "src"
+//                "src/dummy.cc"
             ],
             publicHeadersPath: "include"
         ),
@@ -136,10 +135,12 @@ let package = Package(
 //            sources: [
 //                "getgateway.c",
 //                "natpmp.c",
-//                "getgateway.h",
-//                "natpmp.h",
 //            ],
-//            publicHeadersPath: "natpmp.h"
+//            publicHeadersPath: ".",
+//            cSettings: [
+//                .headerSearchPath("./getgateway.h"),
+//                .headerSearchPath("./natpmp.h")
+//            ]
 //        ),
         .target(
             name: "psl",
@@ -161,7 +162,10 @@ let package = Package(
                 "utp_packedsockaddr.cpp",
                 "utp_utils.cpp",
             ],
-            publicHeadersPath: "include"
+            publicHeadersPath: "include/libutp",
+            cSettings: [
+                .define("POSIX")
+            ]
         ),
         .target(
             name: "miniupnpc",
@@ -190,13 +194,16 @@ let package = Package(
                 "src/minixml.h",
                 "src/receivedata.h",
             ],
-            publicHeadersPath: "include"
+            publicHeadersPath: "include",
+            cSettings: [
+                .headerSearchPath("./")
+            ]
         ),
         .target(
             name: "small",
             path: "small",
             sources: [
-                "src/dummy.cpp"
+//                "src/dummy.cpp"
             ],
             publicHeadersPath: "include"
         ),
