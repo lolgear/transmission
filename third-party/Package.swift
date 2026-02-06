@@ -1,0 +1,209 @@
+// swift-tools-version:6.0
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
+// Packages that are matter for Transmission for macOS.
+//
+// third-party/crc32c
+// third-party/dht
+// third-party/fmt
+// third-party/libb64
+// third-party/libdeflate
+// third-party/libevent
+// third-party/libnatpmp
+// third-party/libpsl
+// third-party/libutp
+// third-party/miniupnp/miniupnpc
+// third-party/small
+// third-party/wildmat
+//
+
+import PackageDescription
+import Foundation
+
+let package = Package(
+    name: "LibTransmissionDependencies",
+    platforms: [.macOS(.v11)],
+    products: [
+// TODO: Add build phase to copy ./macos-crc32-config to ./crc32c/include/crc32c
+// TODO: Add compiler flag -msse4.2 to src/crc32c_sse42.cc
+//        .library(name: "crc32c", targets: ["crc32c"]),
+        .library(name: "dht", targets: ["dht"]),
+// TODO: Fix build by figuring out how to properly resolve headers include statements / macros
+//        .library(name: "fmt", targets: ["fmt"]),
+        .library(name: "b64", targets: ["b64"]),
+        .library(name: "deflate", targets: ["deflate"]),
+// TODO: Copy libevent headers properly.
+// Copy ./macosx-libevent-evconfig-private.h to ./libevent/include/event-evconfig-private.h
+// Copy ./macosx-libevent-event-config.h to ./libevent/include/event2/event-config.h
+//        .library(name: "event", targets: ["event"])
+// TODO: Fix headers layout.
+//        .library(name: "natpmp", targets: ["natpmp"]),
+// TODO: Add build script.
+//        .library(name: "psl", targets: ["psl"])
+        .library(name: "utp", targets: ["utp"]),
+// TODO: Move ./miniupnp/miniupnpc/miniupnpcstrings.h to ./miniupnp/miniupnpc/src/miniupnpcstrings.h
+//      .library(name: "miniupnpc", targets: ["miniupnpc"]),
+// TODO: Add src/dummy.cpp (empty file)
+//        .library(name: "small", targets: ["small"]),
+        .library(name: "wildmat", targets: ["wildmat"])
+    ],
+    targets: [
+        .target(
+            name: "crc32c",
+            path: "crc32c",
+            exclude: [
+//                "crc32c_arm64_unittest.cc",
+//                "crc32c_benchmark.cc",
+//                "crc32c_capi_unittest.c",
+//                "crc32c_portable_unittest.cc",
+//                "crc32c_prefetch_unittest.cc",
+//                "crc32c_read_le_unittest.cc",
+//                "crc32c_round_up_unittest.cc",
+//                "crc32c_sse42_unittest.cc",
+//                "crc32c_test_main.cc",
+//                "crc32c_unittest.cc",
+//                "../third_party/benchmark",
+//                "../third_party/glog",
+//                "../third_party/googletest",
+            ],
+            sources: [
+                "src/crc32c.cc",
+                "src/crc32c_arm64.cc",
+                "src/crc32c_portable.cc",
+                "src/crc32c_sse42.cc",
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "dht",
+            path: "dht",
+            exclude: ["dht-example.c"],
+            publicHeadersPath: "."
+        ),
+        .target(
+            name: "fmt",
+            path: "fmt",
+            sources: [
+                "src"
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "b64",
+            path: "libb64",
+            sources: [
+                "src"
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "deflate",
+            path: "libdeflate",
+            sources: [
+                "lib"
+            ],
+            publicHeadersPath: "."
+        ),
+//        .target(
+//            name: "event",
+//            path: "libevent",
+//            sources: [
+//                "buffer.c",
+//                "bufferevent_filter.c",
+//                "bufferevent_pair.c",
+//                "bufferevent_ratelim.c",
+//                "bufferevent_sock.c",
+//                "bufferevent.c",
+//                "evutil_time.c",
+//                "evdns.c",
+//                "event.c",
+//                "evmap.c",
+//                "evthread.c",
+//                "evutil.c",
+//                "evutil_rand.c",
+//                "http.c",
+//                "kqueue.c",
+//                "listener.c",
+//                "log.c",
+//                "poll.c",
+//                "select.c",
+//                "signal.c",
+//            ]
+//        ),
+//        .target(
+//            name: "natpmp",
+//            path: "libnatpmp",
+//            sources: [
+//                "getgateway.c",
+//                "natpmp.c",
+//                "getgateway.h",
+//                "natpmp.h",
+//            ],
+//            publicHeadersPath: "natpmp.h"
+//        ),
+        .target(
+            name: "psl",
+            path: "libpsl",
+            sources: [
+                "src/lookup_string_in_fixed_set.c",
+                "src/psl.c",
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "utp",
+            path: "libutp",
+            sources: [
+                "utp_api.cpp",
+                "utp_callbacks.cpp",
+                "utp_hash.cpp",
+                "utp_internal.cpp",
+                "utp_packedsockaddr.cpp",
+                "utp_utils.cpp",
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "miniupnpc",
+            path: "miniupnp/miniupnpc",
+            sources: [
+                "src/addr_is_reserved.c",
+                "src/connecthostport.c",
+                "src/igd_desc_parse.c",
+                "src/minisoap.c",
+                "src/minissdpc.c",
+                "src/miniupnpc.c",
+                "src/miniwget.c",
+                "src/minixml.c",
+                "src/portlistingparse.c",
+                "src/receivedata.c",
+                "src/upnpcommands.c",
+                "src/upnpdev.c",
+                "src/upnperrors.c",
+                "src/upnpreplyparse.c",
+                "miniupnpcstrings.h",
+                "src/addr_is_reserved.h",
+                "src/codelength.h",
+                "src/connecthostport.h",
+                "src/minisoap.h",
+                "src/minissdpc.h",
+                "src/minixml.h",
+                "src/receivedata.h",
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "small",
+            path: "small",
+            sources: [
+                "src/dummy.cpp"
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "wildmat",
+            path: "wildmat",
+            publicHeadersPath: "."
+        ),
+    ]
+)
