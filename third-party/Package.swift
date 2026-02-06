@@ -39,7 +39,8 @@ let package = Package(
 // TODO: Fix headers layout. Add public header search path. Maybe add include folder.
 //        .library(name: "natpmp", targets: ["natpmp"]),
 // TODO: Add build script.
-//        .library(name: "psl", targets: ["psl"])
+// TODO: Copy suffixes_dafsa.h to libpsl.
+        .library(name: "psl", targets: ["psl"]),
         .library(name: "utp", targets: ["utp"]),
         .library(name: "miniupnpc", targets: ["miniupnpc"]),
 // TODO: Add src/dummy.cpp (empty file)
@@ -152,7 +153,13 @@ let package = Package(
                 "src/lookup_string_in_fixed_set.c",
                 "src/psl.c",
             ],
-            publicHeadersPath: "include"
+            publicHeadersPath: "include",
+            cSettings: [
+                .headerSearchPath("../suffixes_dafsa.h"),
+                .define("ENABLE_BUILTIN=1"),
+                // for compilation only
+                .define("PACKAGE_VERSION", to: "\"0\""),
+            ]
         ),
         .target(
             name: "utp",
