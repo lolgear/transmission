@@ -26,7 +26,7 @@ let package = Package(
     products: [
 // TODO: Add build phase to copy ./macos-crc32-config to ./crc32c/include/crc32c
 // TODO: Add compiler flag -msse4.2 to src/crc32c_sse42.cc
-//        .library(name: "crc32c", targets: ["crc32c"]),
+        .library(name: "crc32c", targets: ["crc32c"]),
         .library(name: "dht", targets: ["dht"]),
 // TODO: Add src/dummy.cpp (empty file)
         .library(name: "fmt", targets: ["fmt"]),
@@ -71,7 +71,10 @@ let package = Package(
                 "src/crc32c_portable.cc",
                 "src/crc32c_sse42.cc",
             ],
-            publicHeadersPath: "include"
+            publicHeadersPath: "include",
+            cSettings: [
+                .unsafeFlags(["-msse4.2"])
+            ],
         ),
         .target(
             name: "dht",
