@@ -1,4 +1,4 @@
-// swift-tools-version:6.0
+// swift-tools-version:6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Packages that are matter for Transmission for macOS.
@@ -33,7 +33,7 @@ let package = Package(
         .library(name: "b64", targets: ["b64"]),
         .library(name: "deflate", targets: ["deflate"]),
 // TODO: Copy libevent headers properly.
-// Copy/Link ./macosx-libevent-evconfig-private.h to ./libevent/include/event-evconfig-private.h
+// Copy/Link ./macosx-libevent-evconfig-private.h to ./libevent/include/evconfig-private.h
 // Copy/Link ./macosx-libevent-event-config.h to ./libevent/include/event2/event-config.h
         .library(name: "event", targets: ["event"]),
 // TODO: Fix headers layout. Add public header search path. Maybe add include folder.
@@ -120,7 +120,10 @@ let package = Package(
                 "select.c",
                 "signal.c",
             ],
-            publicHeadersPath: "include"
+            publicHeadersPath: "include/event2",
+            cSettings: [
+                .headerSearchPath("include")
+            ]
         ),
         .target(
             name: "natpmp",
