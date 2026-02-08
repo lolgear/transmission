@@ -33,13 +33,15 @@ let package = Package(
         .library(name: "b64", targets: ["b64"]),
         .library(name: "deflate", targets: ["deflate"]),
 // TODO: Copy libevent headers properly.
-// Copy ./macosx-libevent-evconfig-private.h to ./libevent/include/event-evconfig-private.h
-// Copy ./macosx-libevent-event-config.h to ./libevent/include/event2/event-config.h
-//        .library(name: "event", targets: ["event"])
+// Copy/Link ./macosx-libevent-evconfig-private.h to ./libevent/include/event-evconfig-private.h
+// Copy/Link ./macosx-libevent-event-config.h to ./libevent/include/event2/event-config.h
+        .library(name: "event", targets: ["event"]),
 // TODO: Fix headers layout. Add public header search path. Maybe add include folder.
-//        .library(name: "natpmp", targets: ["natpmp"]),
+// Add "include" folder.
+// Copy/Link ./natpmp.h and ./getgateway.h to "include" folder.
+        .library(name: "natpmp", targets: ["natpmp"]),
 // TODO: Add build script.
-// TODO: Copy suffixes_dafsa.h to libpsl.
+// and Copy suffixes_dafsa.h to libpsl.
         .library(name: "psl", targets: ["psl"]),
         .library(name: "utp", targets: ["utp"]),
         .library(name: "miniupnpc", targets: ["miniupnpc"]),
@@ -51,21 +53,6 @@ let package = Package(
         .target(
             name: "crc32c",
             path: "crc32c",
-            exclude: [
-                "src/crc32c_arm64_unittest.cc",
-                "src/crc32c_benchmark.cc",
-                "src/crc32c_capi_unittest.c",
-                "src/crc32c_portable_unittest.cc",
-                "src/crc32c_prefetch_unittest.cc",
-                "src/crc32c_read_le_unittest.cc",
-                "src/crc32c_round_up_unittest.cc",
-                "src/crc32c_sse42_unittest.cc",
-                "src/crc32c_test_main.cc",
-                "src/crc32c_unittest.cc",
-                "third_party/benchmark",
-                "third_party/glog",
-                "third_party/googletest",
-            ],
             sources: [
                 "src/crc32c.cc",
                 "src/crc32c_arm64.cc",
@@ -95,7 +82,8 @@ let package = Package(
             name: "b64",
             path: "libb64",
             sources: [
-                "src"
+                "src/cdecode.c",
+                "src/cencode.c"
             ],
             publicHeadersPath: "include"
         ),
@@ -107,45 +95,42 @@ let package = Package(
             ],
             publicHeadersPath: "."
         ),
-//        .target(
-//            name: "event",
-//            path: "libevent",
-//            sources: [
-//                "buffer.c",
-//                "bufferevent_filter.c",
-//                "bufferevent_pair.c",
-//                "bufferevent_ratelim.c",
-//                "bufferevent_sock.c",
-//                "bufferevent.c",
-//                "evutil_time.c",
-//                "evdns.c",
-//                "event.c",
-//                "evmap.c",
-//                "evthread.c",
-//                "evutil.c",
-//                "evutil_rand.c",
-//                "http.c",
-//                "kqueue.c",
-//                "listener.c",
-//                "log.c",
-//                "poll.c",
-//                "select.c",
-//                "signal.c",
-//            ]
-//        ),
-//        .target(
-//            name: "natpmp",
-//            path: "libnatpmp",
-//            sources: [
-//                "getgateway.c",
-//                "natpmp.c",
-//            ],
-//            publicHeadersPath: ".",
-//            cSettings: [
-//                .headerSearchPath("./getgateway.h"),
-//                .headerSearchPath("./natpmp.h")
-//            ]
-//        ),
+        .target(
+            name: "event",
+            path: "libevent",
+            sources: [
+                "buffer.c",
+                "bufferevent_filter.c",
+                "bufferevent_pair.c",
+                "bufferevent_ratelim.c",
+                "bufferevent_sock.c",
+                "bufferevent.c",
+                "evutil_time.c",
+                "evdns.c",
+                "event.c",
+                "evmap.c",
+                "evthread.c",
+                "evutil.c",
+                "evutil_rand.c",
+                "http.c",
+                "kqueue.c",
+                "listener.c",
+                "log.c",
+                "poll.c",
+                "select.c",
+                "signal.c",
+            ],
+            publicHeadersPath: "include"
+        ),
+        .target(
+            name: "natpmp",
+            path: "libnatpmp",
+            sources: [
+                "getgateway.c",
+                "natpmp.c",
+            ],
+            publicHeadersPath: "include"
+        ),
         .target(
             name: "psl",
             path: "libpsl",
@@ -155,7 +140,6 @@ let package = Package(
             ],
             publicHeadersPath: "include",
             cSettings: [
-                .headerSearchPath("../suffixes_dafsa.h"),
                 .define("ENABLE_BUILTIN=1"),
                 // for compilation only
                 .define("PACKAGE_VERSION", to: "\"0\""),
@@ -222,5 +206,6 @@ let package = Package(
             path: "wildmat",
             publicHeadersPath: "."
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx20
 )
