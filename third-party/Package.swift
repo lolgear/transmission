@@ -28,6 +28,7 @@ let package = Package(
 // TODO: Add compiler flag -msse4.2 to src/crc32c_sse42.cc
         .library(name: "crc32c", targets: ["crc32c"]),
         .library(name: "dht", targets: ["dht"]),
+        .library(name: "fast_float", targets: ["fast_float"]),
 // TODO: Add src/dummy.cpp (empty file)
         .library(name: "fmt", targets: ["fmt"]),
         .library(name: "b64", targets: ["b64"]),
@@ -45,8 +46,11 @@ let package = Package(
         .library(name: "psl", targets: ["psl"]),
         .library(name: "utp", targets: ["utp"]),
         .library(name: "miniupnpc", targets: ["miniupnpc"]),
+        .library(name: "rapidjson", targets: ["rapidjson"]),
 // TODO: Add src/dummy.cpp (empty file)
         .library(name: "small", targets: ["small"]),
+        .library(name: "utfcpp", targets: ["utfcpp"]),
+        .library(name: "wide-integer", targets: ["wide-integer"]),
         .library(name: "wildmat", targets: ["wildmat"])
     ],
     targets: [
@@ -69,6 +73,12 @@ let package = Package(
             path: "dht",
             exclude: ["dht-example.c"],
             publicHeadersPath: "."
+        ),
+        .target(
+            name: "fast_float",
+            path: "fast_float",
+            sources: [],
+            publicHeadersPath: "include/fast_float"
         ),
         .target(
             name: "fmt",
@@ -193,16 +203,32 @@ let package = Package(
             ],
             publicHeadersPath: "include",
             cSettings: [
-                .headerSearchPath("./")
+                .headerSearchPath(".")
             ]
+        ),
+        .target(
+            name: "rapidjson",
+            path: "rapidjson",
+            sources: [],
+            publicHeadersPath: "include"
         ),
         .target(
             name: "small",
             path: "small",
-            sources: [
-//                "src/dummy.cpp"
-            ],
+            sources: [],
             publicHeadersPath: "include"
+        ),
+        .target(
+            name: "utfcpp",
+            path: "utfcpp",
+            sources: [],
+            publicHeadersPath: "source"
+        ),
+        .target(
+            name: "wide-integer",
+            path: "wide-integer",
+            sources: [],
+            publicHeadersPath: "math/wide_integer"
         ),
         .target(
             name: "wildmat",
