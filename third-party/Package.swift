@@ -36,7 +36,7 @@ let package = Package(
 // TODO: Copy libevent headers properly.
 // Copy/Link ./macosx-libevent-evconfig-private.h to ./libevent/include/evconfig-private.h
 // Copy/Link ./macosx-libevent-event-config.h to ./libevent/include/event2/event-config.h
-        .library(name: "event", targets: ["event"]),
+        .library(name: "eventlib", targets: ["eventlib"]),
 // TODO: Fix headers layout. Add public header search path. Maybe add include folder.
 // Add "include" folder.
 // Copy/Link ./natpmp.h and ./getgateway.h to "include" folder.
@@ -47,6 +47,7 @@ let package = Package(
         .library(name: "utp", targets: ["utp"]),
         .library(name: "miniupnpc", targets: ["miniupnpc"]),
         .library(name: "rapidjson", targets: ["rapidjson"]),
+        .library(name: "sigslot", targets: ["sigslot"]),
 // TODO: Add src/dummy.cpp (empty file)
         .library(name: "small", targets: ["small"]),
         .library(name: "utfcpp", targets: ["utfcpp"]),
@@ -78,7 +79,7 @@ let package = Package(
             name: "fast_float",
             path: "fast_float",
             sources: [],
-            publicHeadersPath: "include/fast_float"
+            publicHeadersPath: "include"
         ),
         .target(
             name: "fmt",
@@ -106,7 +107,7 @@ let package = Package(
             publicHeadersPath: "."
         ),
         .target(
-            name: "event",
+            name: "eventlib",
             path: "libevent",
             sources: [
                 "buffer.c",
@@ -130,9 +131,9 @@ let package = Package(
                 "select.c",
                 "signal.c",
             ],
-            publicHeadersPath: "include/event2",
+            publicHeadersPath: "include",
             cSettings: [
-                .headerSearchPath("include")
+                .headerSearchPath("include/event2")
             ]
         ),
         .target(
@@ -169,8 +170,9 @@ let package = Package(
                 "utp_packedsockaddr.cpp",
                 "utp_utils.cpp",
             ],
-            publicHeadersPath: "include/libutp",
+            publicHeadersPath: "include",
             cSettings: [
+                .headerSearchPath("include/libutp"),
                 .define("POSIX")
             ]
         ),
@@ -203,12 +205,22 @@ let package = Package(
             ],
             publicHeadersPath: "include",
             cSettings: [
+                .headerSearchPath("include/miniupnpc"),
                 .headerSearchPath(".")
             ]
         ),
         .target(
             name: "rapidjson",
             path: "rapidjson",
+            sources: [],
+            publicHeadersPath: "include",
+            cSettings: [
+                .define("RAPIDJSON_HAS_STDSTRING", to: "1")
+            ]
+        ),
+        .target(
+            name: "sigslot",
+            path: "sigslot",
             sources: [],
             publicHeadersPath: "include"
         ),
@@ -228,7 +240,11 @@ let package = Package(
             name: "wide-integer",
             path: "wide-integer",
             sources: [],
-            publicHeadersPath: "math/wide_integer"
+            publicHeadersPath: "include",
+            cSettings: [
+                .define("WIDE_INTEGER_DISABLE_FLOAT_INTEROP"),
+                .define("WIDE_INTEGER_DISABLE_IOSTREAM")
+            ]
         ),
         .target(
             name: "wildmat",
