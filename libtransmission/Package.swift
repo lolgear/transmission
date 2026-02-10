@@ -32,6 +32,7 @@ let package = Package(
                 .product(name: "utfcpp", package: "third-party"),
                 .product(name: "sigslot", package: "third-party"),
                 .product(name: "small", package: "third-party"),
+                .product(name: "wide-integer", package: "third-party"),
                 .product(name: "wildmat", package: "third-party"),
             ],
             path: ".",
@@ -114,11 +115,12 @@ let package = Package(
             ],
             publicHeadersPath: ".",
             cSettings: [
-                .headerSearchPath(".."),
                 .define("WITH_UTP"),
                 .define("__TRANSMISSION__"),
                 .define("HAVE_FLOCK"),
-                .define("WITH_CCRYPTO")
+                .define("WITH_CCRYPTO"),
+                .define("WITH_KQUEUE"),
+                .define("BUILD_MAC_CLIENT")
             ]
         )
     ],

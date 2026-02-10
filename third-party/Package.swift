@@ -73,7 +73,7 @@ let package = Package(
             name: "dht",
             path: "dht",
             exclude: ["dht-example.c"],
-            publicHeadersPath: "."
+            publicHeadersPath: "include"
         ),
         .target(
             name: "fast_float",
@@ -84,9 +84,7 @@ let package = Package(
         .target(
             name: "fmt",
             path: "fmt",
-            sources: [
-//                "src/dummy.cc"
-            ],
+            sources: [],
             publicHeadersPath: "include"
         ),
         .target(
