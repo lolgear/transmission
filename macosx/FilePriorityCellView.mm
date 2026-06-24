@@ -21,17 +21,16 @@ static CGFloat const kImageOverlap = 1.0;
 
 @implementation FilePriorityCellView
 
-- (instancetype)initWithFrame:(NSRect)frameRect
++ (NSSegmentedControl* )segmentedControl
 {
-    if ((self = [super initWithFrame:frameRect]))
-    {
-        // Create segmented control for hover state
-        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
+    static NSSegmentedControl *fSegmentedControl = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        __auto_type segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
         segmentedControl.translatesAutoresizingMaskIntoConstraints = NO;
         segmentedControl.trackingMode = NSSegmentSwitchTrackingSelectAny;
         segmentedControl.controlSize = NSControlSizeMini;
         segmentedControl.segmentCount = 3;
-
         for (NSInteger i = 0; i < segmentedControl.segmentCount; i++)
         {
             [segmentedControl setLabel:@"" forSegment:i];
@@ -41,13 +40,75 @@ static CGFloat const kImageOverlap = 1.0;
         [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlLow"] forSegment:0];
         [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlNormal"] forSegment:1];
         [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlHigh"] forSegment:2];
+        
+        fSegmentedControl = segmentedControl;
+    });
+    
+    return fSegmentedControl;
+}
 
-        segmentedControl.target = self;
-        segmentedControl.action = @selector(segmentedControlClicked:);
-        segmentedControl.hidden = YES;
+- (void)detachSegmentedControl
+{
+    if (self.class.segmentedControl.superview == self)
+    {
+        [self.class.segmentedControl removeFromSuperview];
+    }
+}
 
-        [self addSubview:segmentedControl];
-        _segmentedControl = segmentedControl;
+- (void)attachSegmentedControl
+{
+    __auto_type segmentedControl = self.class.segmentedControl;
+    [self addSubview:segmentedControl];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [segmentedControl.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+        [segmentedControl.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+    ]];
+    
+    [self configureSegmentedControl:segmentedControl];
+}
+
+- (void)configureSegmentedControl:(NSSegmentedControl *)segmentedControl
+{
+    FileListNode* node = self.node;
+    Torrent* torrent = node.torrent;
+    NSSet* priorities = [torrent filePrioritiesForIndexes:node.indexes];
+
+    [segmentedControl setSelected:[priorities containsObject:@(TR_PRI_LOW)] forSegment:0];
+    [segmentedControl setSelected:[priorities containsObject:@(TR_PRI_NORMAL)] forSegment:1];
+    [segmentedControl setSelected:[priorities containsObject:@(TR_PRI_HIGH)] forSegment:2];
+    
+    segmentedControl.target = self;
+    segmentedControl.action = @selector(segmentedControlClicked:);
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    if ((self = [super initWithFrame:frameRect]))
+    {
+        // Create segmented control for hover state
+//        NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
+//        segmentedControl.translatesAutoresizingMaskIntoConstraints = NO;
+//        segmentedControl.trackingMode = NSSegmentSwitchTrackingSelectAny;
+//        segmentedControl.controlSize = NSControlSizeMini;
+//        segmentedControl.segmentCount = 3;
+//
+//        for (NSInteger i = 0; i < segmentedControl.segmentCount; i++)
+//        {
+//            [segmentedControl setLabel:@"" forSegment:i];
+//            [segmentedControl setWidth:9.0f forSegment:i];
+//        }
+//
+//        [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlLow"] forSegment:0];
+//        [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlNormal"] forSegment:1];
+//        [segmentedControl setImage:[NSImage imageNamed:@"PriorityControlHigh"] forSegment:2];
+//
+//        segmentedControl.target = self;
+//        segmentedControl.action = @selector(segmentedControlClicked:);
+//        segmentedControl.hidden = YES;
+//
+//        [self addSubview:segmentedControl];
+//        _segmentedControl = segmentedControl;
 
         // Create container view for priority icons
         NSView* iconsContainerView = [[NSView alloc] initWithFrame:NSZeroRect];
@@ -57,8 +118,8 @@ static CGFloat const kImageOverlap = 1.0;
 
         // Setup constraints
         [NSLayoutConstraint activateConstraints:@[
-            [segmentedControl.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
-            [segmentedControl.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+//            [segmentedControl.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+//            [segmentedControl.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
 
             [iconsContainerView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
             [iconsContainerView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
@@ -141,20 +202,30 @@ static CGFloat const kImageOverlap = 1.0;
     NSSet* priorities = [torrent filePrioritiesForIndexes:node.indexes];
 
     NSUInteger const count = priorities.count;
+    
+    if (self.hovered)
+    {
+        [self attachSegmentedControl];
+    }
+    else
+    {
+        [self detachSegmentedControl];
+    }
+
     if (self.hovered && count > 0)
     {
         // Show segmented control
-        self.segmentedControl.hidden = NO;
+//        self.segmentedControl.hidden = NO;
         self.iconsContainerView.hidden = YES;
 
-        [self.segmentedControl setSelected:[priorities containsObject:@(TR_PRI_LOW)] forSegment:0];
-        [self.segmentedControl setSelected:[priorities containsObject:@(TR_PRI_NORMAL)] forSegment:1];
-        [self.segmentedControl setSelected:[priorities containsObject:@(TR_PRI_HIGH)] forSegment:2];
+//        [self.segmentedControl setSelected:[priorities containsObject:@(TR_PRI_LOW)] forSegment:0];
+//        [self.segmentedControl setSelected:[priorities containsObject:@(TR_PRI_NORMAL)] forSegment:1];
+//        [self.segmentedControl setSelected:[priorities containsObject:@(TR_PRI_HIGH)] forSegment:2];
     }
     else
     {
         // Show static priority icons
-        self.segmentedControl.hidden = YES;
+//        self.segmentedControl.hidden = YES;
         self.iconsContainerView.hidden = NO;
 
         [self updatePriorityIcons:priorities];
